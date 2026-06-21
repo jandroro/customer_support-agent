@@ -32,3 +32,5 @@ wheels/
 *.key
 *.p12
 *.pfx
+
+.claude

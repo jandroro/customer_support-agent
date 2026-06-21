@@ -1,0 +1,34 @@
+# Local state — never commit Terraform state files
+*.tfstate
+*.tfstate.*
+*.tfstate.backup
+
+# Crash logs
+crash.log
+crash.*.log
+
+# Override files (local developer overrides)
+override.tf
+override.tf.json
+*_override.tf
+*_override.tf.json
+
+# Terraform working directories
+.terraform/
+.terraform.lock.hcl
+
+# Variable files that may contain secrets
+*.tfvars
+!terraform.tfvars.example
+
+# Sensitive plan output
+*.tfplan
+
+# Build artifacts — generated Lambda zips and archive_file outputs
+.build/
+
+# archive_file outputs inside modules
+modules/**/post_signup.zip
+
+# macOS
+.DS_Store

@@ -1,0 +1,8 @@
+# Copy this file to terraform.tfvars and fill in the values.
+# terraform.tfvars is intentionally excluded from version control.
+
+aws_profile  = "my-aws-profile"
+aws_region   = "us-east-1"
+project_name = "customer-support-agent"
+environment  = "dev"
+model_id     = "MY_BEDROCK_MODEL"

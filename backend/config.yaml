@@ -1,0 +1,41 @@
+# Backend configuration.
+#
+# Values here are read at startup via app/core/config.py (pydantic-settings).
+# Override any value with an env var using a "__" path delimiter, e.g.:
+#   AWS__PROFILE=your-aws-profile
+#   COGNITO__TEST_PASSWORD=...
+# This lets you keep secrets out of this file in real deployments while
+# still defaulting to the lab/demo credentials already used across this
+# project's notebooks (testuser / MCPServerPool).
+
+aws:
+  region: us-east-1
+  # Set to your AWS CLI profile name for local development (matches the
+  # profile in iac/terraform.tfvars), e.g. via AWS__PROFILE in .env. Leave
+  # null when running inside AWS (ECS/EC2/Lambda) so boto3 uses the attached
+  # IAM role.
+  profile: null
+
+agentcore:
+  # SSM parameter published by Terraform (iac/modules/bedrock_agentcore_runtime)
+  # after `terraform apply` — always points at the currently deployed Runtime.
+  runtime_arn_ssm_parameter: /app/customersupport/agentcore/runtime_arn
+  endpoint_name: DEFAULT
+
+cognito:
+  # MCPServerPool (iac/modules/cognito_lab) — also the pool real end users
+  # authenticate against (register/login) via SRP, since the Runtime/Gateway
+  # CUSTOM_JWT authorizer only trusts tokens issued by this pool. SSM
+  # parameter names published by Terraform.
+  pool_id_ssm_parameter: /app/customersupport/agentcore/mcp_lab/pool_id
+  client_id_ssm_parameter: /app/customersupport/agentcore/mcp_lab/client_id
+  client_secret_ssm_parameter: /app/customersupport/agentcore/mcp_lab/client_secret
+  discovery_url_ssm_parameter: /app/customersupport/agentcore/mcp_lab/cognito_discovery_url
+  test_username: testuser
+
+agent:
+  default_actor_id: customer_001
+
+cors:
+  allowed_origins:
+    - http://localhost:3000

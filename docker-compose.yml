@@ -1,0 +1,32 @@
+services:
+  backend:
+    build:
+      context: ./backend
+    container_name: customer-support-backend
+    ports:
+      - "8000:8000"
+    environment:
+      # Overrides config.yaml via pydantic-settings' "__" nested delimiter.
+      # No fallback profile on purpose — set AWS_PROFILE in .env (see
+      # .env.example) to your own AWS CLI profile before running this.
+      AWS__PROFILE: ${AWS_PROFILE:?Set AWS_PROFILE in .env — see .env.example}
+      AWS__REGION: ${AWS_REGION:-us-east-1}
+    volumes:
+      # The backend authenticates with the AWS profile above — mount the
+      # host's credentials read-only rather than baking them into the image.
+      - ~/.aws:/root/.aws:ro
+    restart: unless-stopped
+
+  frontend:
+    build:
+      context: ./frontend
+      args:
+        # Must be reachable from the browser, not from inside the Docker
+        # network — the frontend container itself never calls the backend.
+        NEXT_PUBLIC_API_BASE_URL: http://localhost:8000
+    container_name: customer-support-frontend
+    ports:
+      - "3000:3000"
+    depends_on:
+      - backend
+    restart: unless-stopped

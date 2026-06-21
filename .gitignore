@@ -1,0 +1,34 @@
+# Python-generated files
+__pycache__/
+*.py[oc]
+build/
+dist/
+wheels/
+*.egg-info
+
+# Jupyter
+.ipynb_checkpoints/
+
+# Virtual environments
+.venv
+
+# docker-compose local overrides
+.env
+
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+._*
+.Spotlight-V100
+.Trashes
+.fseventsd
+.DocumentRevisions-V100
+.VolumeIcon.icns
+.com.apple.timemachine.donotpresent
+
+# Sensitive credential/key files — defensive, in case any are ever added
+*.pem
+*.key
+*.p12
+*.pfx

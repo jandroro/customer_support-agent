@@ -1,0 +1,19 @@
+[project]
+name = "customer-support"
+version = "0.1.0"
+description = "Amazon Bedrock AgentCore Customer Support Agent — step-by-step Jupyter labs (src/notebooks)"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "boto3>=1.43.34",
+    "bedrock-agentcore>=1.1.1",
+    "bedrock-agentcore-starter-toolkit>=0.2.3",
+    "strands-agents>=1.44.0",
+    "strands-agents-tools>=0.8.1",
+    "ddgs>=9.14.4",
+    "mcp>=1.28.0",
+    "python-dotenv>=1.2.2",
+    "pyyaml>=6.0.3",
+    "requests>=2.34.2",
+    "jupyterlab>=4.0.0",
+]

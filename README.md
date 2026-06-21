@@ -1,10 +1,10 @@
 # Customer Support Agent — Amazon Bedrock AgentCore
 
-A production-grade Customer Support Agent for **TechCorp**, an e-commerce company, built end-to-end on **Amazon Bedrock AgentCore** — with secure tool access via AgentCore Gateway, persistent memory, Cedar-based authorization, and a Claude/ChatGPT-style web chat on top.
+A production-grade Customer Support Agent for **TechCorp**, an e-commerce company, built end-to-end on **Amazon Bedrock AgentCore** — with secure tool access via AgentCore Gateway, persistent memory, Cedar-based authorization, and a web chat interface on top.
 
 This is not a toy chatbot demo: the entire stack — Runtime, Gateway, Memory, Knowledge Base, authentication, and authorization — is provisioned as code and designed to mirror how this would actually run in production.
 
-> Based on the AWS workshop [Getting started with Amazon Bedrock AgentCore](https://catalog.us-east-1.prod.workshops.aws/workshops/850fcd5c-fd1f-48d7-932c-ad9babede979/en-US) — this repository reimplements its labs as Terraform-managed infrastructure (instead of notebook-driven SDK calls) and replaces the reference Streamlit client with the Next.js + FastAPI app described below. The original lab structure is preserved in `src/notebooks/`.
+> Based on the AWS workshop [Getting started with Amazon Bedrock AgentCore](https://catalog.us-east-1.prod.workshops.aws/workshops/850fcd5c-fd1f-48d7-932c-ad9babede979/en-US) — this repository reimplements its labs as Terraform-managed infrastructure (instead of notebook-driven SDK calls) and replaces the reference Streamlit client with the Next.js + FastAPI app described below. The modified lab structure is located in `src/notebooks/`.
 
 ## Table of contents
 
@@ -31,13 +31,11 @@ Customers contact TechCorp support for product specs, return/warranty policy que
 
 ## Architecture
 
-![Architecture diagram](docs/architecture.png)
-
-> **Note:** this diagram uses "Streamlit app" as the client to illustrate the general AgentCore reference architecture. In this repository, that client is replaced by the **Next.js frontend + FastAPI backend** described below — everything to the right of "Local environment" (AgentCore Runtime, Gateway, Memory, Identity, Policy, Observability) is exactly what this project provisions and runs.
+![Architecture diagram](docs/images/architecture.png)
 
 **Request flow:**
 
-1. **Local environment → AgentCore Runtime.** The user's question reaches the Runtime as an HTTP request. In this repo, the "Streamlit app" box is our **Next.js frontend**, which calls the **FastAPI backend**, which forwards the request to the Runtime's data-plane API with a JWT bearer token (`Authorization` header).
+1. **Local environment → AgentCore Runtime.** The user's question reaches the Runtime as an HTTP request. In this repo, our **Next.js frontend**, which calls the **FastAPI backend**, forwards the request to the Runtime's data-plane API with a JWT bearer token (`Authorization` header).
 2. **AgentCore Identity ↔ Amazon Cognito.** Both the Runtime and the Gateway validate that JWT against a `CUSTOM_JWT` authorizer backed by Cognito (`MCPServerPool` — `iac/modules/cognito_lab`). The backend (`backend/app/services/cognito_auth.py`) supplies this token two ways: a real logged-in user's own JWT (register/login via SRP, `/api/auth/*`), or — when no user is logged in — a shared service identity (`testuser`) authenticated once and cached.
 3. **Customer Support Agent (inside AgentCore Runtime).** A Strands agent (`src/customer_support_agent/main.py`) runs three in-process tools directly — `get_return_policy()`, `get_product_info()`, `get_technical_support()` — the first two are static lookups, the third retrieves from the **Knowledge Base** (S3 Vectors, seeded with product guides).
 4. **Invokes LLM.** The agent calls **Amazon Bedrock LLMs** to reason over the user's question and decide which tool(s) to use.
@@ -100,11 +98,13 @@ Customers contact TechCorp support for product specs, return/warranty policy que
 │       ├── lab-01-create-an-agent.ipynb       … lab-07-cleanup.ipynb
 │       └── lab_helpers/                        # Shared boto3/SSM helpers used across labs
 ├── docker/                       # Dockerfile + requirements.txt for the agent container
+├── docs/
+│   ├── images/                   # Assets/images used by the documentation
+│   ├── DEPLOYMENT_GUIDE.md       # Full infra deployment walkthrough
 ├── backend/                      # FastAPI — bridges the frontend to the AgentCore Runtime
 ├── frontend/                     # Next.js + Tailwind — chat UI
 ├── docker-compose.yml            # Runs backend + frontend together
 ├── pyproject.toml                # Python deps for running the notebooks locally
-├── DEPLOYMENT_GUIDE.md           # Full infra deployment walkthrough
 └── README.md                     # You are here
 ```
 
@@ -122,7 +122,7 @@ Customers contact TechCorp support for product specs, return/warranty policy que
 
 ### 1. Deploy the AWS infrastructure
 
-The entire AgentCore stack (Runtime, Gateway, Memory, Knowledge Base, Cognito, DynamoDB, IAM) is provisioned by Terraform — see **[DEPLOYMENT_GUIDE.md](DEPLOYMENT_GUIDE.md)** for the full two-phase deployment (build/push the agent image, then `terraform apply`).
+The entire AgentCore stack (Runtime, Gateway, Memory, Knowledge Base, Cognito, DynamoDB, IAM) is provisioned by Terraform — see **[DEPLOYMENT_GUIDE.md](./docs/DEPLOYMENT_GUIDE.md)** for the full two-phase deployment (build/push the agent image, then `terraform apply`).
 
 ```bash
 cd iac
@@ -138,12 +138,15 @@ terraform apply
 #### Option A — Docker Compose (recommended)
 
 ```bash
+cd ..
 cp .env.example .env   # set AWS_PROFILE / AWS_REGION if different from the defaults
 docker compose up --build
 ```
 
 - Frontend: `http://localhost:3000`
 - Backend: `http://localhost:8000` (`/api/health` for a quick check)
+    * `/api/health` for a quick check
+    * `/docs` for api documentation
 
 The backend container authenticates to AWS using the profile named in `.env`, mounting your host's `~/.aws` directory read-only — no credentials are baked into the image. Stop everything with `docker compose down`.
 
@@ -159,7 +162,7 @@ cp .env.example .env   # optional — override config.yaml values (AWS profile, 
 uvicorn app.main:app --reload --port 8000
 ```
 
-See [backend/README.md](backend/README.md) for configuration details and how authentication to the Runtime works.
+See [BACKEND.md](docs/BACKEND.md) for configuration details and how authentication to the Runtime works.
 
 **Frontend (Next.js)**, in a separate terminal:
 
@@ -170,16 +173,17 @@ cp .env.local.example .env.local
 npm run dev
 ```
 
-See [frontend/README.md](frontend/README.md) for more details.
+See [FRONTEND.md](docs/FRONTEND.md) for more details.
 
 ### Optional: step-by-step notebooks
 
 `src/notebooks/` has 7 Jupyter labs that walk through the same stack incrementally — agent prototype, memory, Gateway/identity, Runtime deployment, online evaluation, the frontend, and cleanup. They read every resource identifier from SSM (the same parameters Terraform publishes above), so run them anytime after `terraform apply`:
 
 ```bash
+# We need to be located in the root of the project
 python3 -m venv .venv && source .venv/bin/activate
 pip install -e .              # installs from pyproject.toml
-jupyter lab src/notebooks
+uv run --active --with jupyter jupyter lab src/notebooks
 ```
 
 ## Trying it out
@@ -210,7 +214,7 @@ The frontend requires logging in (or registering) with a MCPServerPool Cognito a
 
 | Document | Covers |
 |---|---|
-| [DEPLOYMENT_GUIDE.md](DEPLOYMENT_GUIDE.md) | Full infrastructure deployment (two-phase Terraform + image build/push), resource reference, troubleshooting, teardown |
-| [backend/README.md](backend/README.md) | Backend configuration, authentication flow, API reference |
-| [frontend/README.md](frontend/README.md) | Frontend setup and environment variables |
+| [DEPLOYMENT_GUIDE.md](docs/DEPLOYMENT_GUIDE.md) | Full infrastructure deployment (two-phase Terraform + image build/push), resource reference, troubleshooting, teardown |
+| [BACKEND.md](docs/BACKEND.md) | Backend configuration, authentication flow, API reference |
+| [FRONTEND.md](docs/FRONTEND.md) | Frontend setup and environment variables |
 | [src/notebooks/](src/notebooks/) | 7 step-by-step Jupyter labs covering the same stack (agent, memory, Gateway, Runtime, evaluation, frontend, cleanup) |

@@ -148,6 +148,7 @@ docker compose up --build
 - Backend: `http://localhost:8000` (`/api/health` for a quick check)
     * `/api/health` for a quick check
     * `/docs` for api documentation
+    * `/redoc` for api in OpenAPI specification
 
 The backend container authenticates to AWS using the profile named in `.env`, mounting your host's `~/.aws` directory read-only — no credentials are baked into the image. Stop everything with `docker compose down`.
 
@@ -165,6 +166,8 @@ uvicorn app.main:app --reload --port 8000
 
 See [BACKEND.md](docs/BACKEND.md) for configuration details and how authentication to the Runtime works.
 
+![Backend UI](docs/images/backend_docs.png)
+
 **Frontend (Next.js)**, in a separate terminal:
 
 ```bash
@@ -175,6 +178,8 @@ npm run dev
 ```
 
 See [FRONTEND.md](docs/FRONTEND.md) for more details.
+
+![Frontend UI](docs/images/frontend.png)
 
 ### Optional: step-by-step notebooks
 

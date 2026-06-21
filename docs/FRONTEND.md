@@ -1,6 +1,6 @@
 # Customer Support Agent — Frontend (Next.js + Tailwind)
 
-A Claude/ChatGPT-style chat UI for the TechCorp customer support agent.
+A chat UI interface for the TechCorp customer support agent.
 Talks only to the FastAPI backend in `../backend` — it never calls AWS
 directly (no AWS credentials live in the browser).
 
@@ -35,6 +35,14 @@ npm run dev
 Open `http://localhost:3000`. Make sure the backend is running first (see
 `../backend/README.md`) and that `NEXT_PUBLIC_API_BASE_URL` in `.env.local`
 points at it.
+
+![Sign Up](images/frontend_signup.png)
+
+![Sign In](images/frontend_signin.png)
+
+![Chat](images/frontend.png)
+
+![Delete Conversation](images/frontend_delete_conversation.png)
 
 ## How it works
 

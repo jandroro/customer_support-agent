@@ -36,7 +36,7 @@ Once running, interactive API docs are available at:
 
 ![Swagger UI](images/backend_docs.png)
 
-![Swagger UI](images/backend_redoc.png)
+![OpenAPI UI](images/backend_redoc.png)
 
 ## How it works
 

@@ -34,6 +34,10 @@ Once running, interactive API docs are available at:
 - **ReDoc**: `http://localhost:8000/redoc`
 - **OpenAPI schema**: `http://localhost:8000/openapi.json`
 
+![Swagger UI](images/backend_docs.png)
+
+![Swagger UI](images/backend_redoc.png)
+
 ## How it works
 
 - The Runtime requires a JWT bearer token (`CUSTOM_JWT` authorizer against

@@ -33,4 +33,5 @@ wheels/
 *.p12
 *.pfx
 
-.claude
+# Claude Code local state
+.claude/

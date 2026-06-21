@@ -19,6 +19,7 @@ This is not a toy chatbot demo: the entire stack — Runtime, Gateway, Memory, K
 - [Observability](#observability)
 - [Security model](#security-model)
 - [Documentation map](#documentation-map)
+- [References](#references)
 
 ## Overview
 
@@ -218,3 +219,8 @@ The frontend requires logging in (or registering) with a MCPServerPool Cognito a
 | [BACKEND.md](docs/BACKEND.md) | Backend configuration, authentication flow, API reference |
 | [FRONTEND.md](docs/FRONTEND.md) | Frontend setup and environment variables |
 | [src/notebooks/](src/notebooks/) | 7 step-by-step Jupyter labs covering the same stack (agent, memory, Gateway, Runtime, evaluation, frontend, cleanup) |
+
+## References
+
+- [Getting started with Amazon Bedrock AgentCore](https://catalog.us-east-1.prod.workshops.aws/workshops/850fcd5c-fd1f-48d7-932c-ad9babede979/en-US) — the original AWS workshop this project is based on.
+- [Icons8](https://icons8.com/icons) — source of some of the icons used in the architecture diagram (`docs/images/architecture.png`).

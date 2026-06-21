@@ -144,7 +144,7 @@ resource "aws_iam_role_policy" "csa_runtime_policy" {
 resource "aws_bedrockagentcore_agent_runtime" "csa_runtime" {
   # agent_runtime_name must match ^[a-zA-Z][a-zA-Z0-9_]{0,47}$ — no hyphens allowed,
   # unlike most other AWS resource names, so name_prefix's hyphens are replaced here only.
-  agent_runtime_name = "${replace(var.name_prefix, "-", "_")}_runtime"
+  agent_runtime_name = "${replace(var.name_prefix, "-", "_")}"
   description        = "Customer Support Agent developed on Bedrock AgentCore"
   role_arn           = aws_iam_role.csa_runtime_role.arn
 

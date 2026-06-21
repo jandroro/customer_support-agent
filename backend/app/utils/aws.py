@@ -1,7 +1,6 @@
 """Shared boto3/SSM helpers, used by every service that talks to AWS."""
 
 import boto3
-
 from ..core.config import settings
 
 

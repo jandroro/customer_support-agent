@@ -1,7 +1,6 @@
 """Request/response schemas for the /api/auth/* endpoints."""
 
 from typing import Optional
-
 from pydantic import BaseModel, Field
 
 

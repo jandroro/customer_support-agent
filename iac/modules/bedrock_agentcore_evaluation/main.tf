@@ -1,24 +1,3 @@
-# ──────────────────────────────────────────────────────────────────────────────
-# Bedrock AgentCore Online Evaluation Config — continuously samples live traffic
-# from the Runtime's logs and scores it with built-in evaluators. Mirrors
-# Evaluation.create_online_config() previously used from
-# notebooks/lab-05-agentcore-evals.ipynb.
-#
-# data_source_config targets the "DEFAULT" endpoint specifically — confirmed
-# via the console's "Define with an agent endpoint" picker (Runtime: this
-# module's runtime, Endpoint: DEFAULT), which resolves to the runtime's
-# auto-created per-endpoint log group (/aws/bedrock-agentcore/runtimes/<id>-DEFAULT).
-# DEFAULT is the endpoint our backend/notebooks actually invoke
-# (endpoint_name="DEFAULT" everywhere) — NOT the explicit
-# aws_bedrockagentcore_agent_runtime_endpoint resource this project also
-# creates, which currently receives no real traffic.
-#
-# Unlike the Python SDK's auto_create_execution_role=True, the Terraform
-# resource requires an existing evaluation_execution_role_arn — created below.
-# The output log group (/aws/bedrock-agentcore/evaluations/results/...) is
-# computed/auto-created by the service itself, not declared here.
-# ──────────────────────────────────────────────────────────────────────────────
-
 data "aws_caller_identity" "current" {}
 data "aws_region" "current" {}
 

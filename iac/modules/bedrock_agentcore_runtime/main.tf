@@ -160,9 +160,6 @@ resource "aws_bedrockagentcore_agent_runtime" "csa_runtime" {
     network_mode = "PUBLIC"
   }
 
-  # Mirrors lab_helpers Runtime.configure(authorizer_configuration=...) — JWTs
-  # must be issued by the MCPServerPool (modules/cognito_lab), same pool that
-  # authorizes the Gateway.
   authorizer_configuration {
     custom_jwt_authorizer {
       allowed_clients = [var.allowed_client_id]
@@ -170,9 +167,6 @@ resource "aws_bedrockagentcore_agent_runtime" "csa_runtime" {
     }
   }
 
-  # Mirrors lab_helpers Runtime.configure(request_header_configuration=...) —
-  # required for OAuth Authorization header propagation into the agent code
-  # (main.py reads context.request_headers["Authorization"]).
   request_header_configuration {
     request_header_allowlist = [
       "Authorization",
@@ -183,14 +177,6 @@ resource "aws_bedrockagentcore_agent_runtime" "csa_runtime" {
   tags = var.tags
 }
 
-# Note: no explicit aws_bedrockagentcore_agent_runtime_endpoint resource here.
-# AWS auto-creates a "DEFAULT" endpoint with every Runtime, and that's the one
-# backend/notebooks actually invoke (endpoint_name="DEFAULT" everywhere) — a
-# separate custom endpoint was found to receive no real traffic and was removed.
-
-# Mirrors lab_helpers put_ssm_parameter("/app/customersupport/agentcore/runtime_arn", ...)
-# called after Runtime.launch() — consumed by lab5_frontend/chat.py and the
-# evals notebook to know which runtime to invoke.
 resource "aws_ssm_parameter" "runtime_arn" {
   name        = "/app/customersupport/agentcore/runtime_arn"
   type        = "String"

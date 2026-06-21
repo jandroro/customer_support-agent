@@ -2,16 +2,14 @@
 
 import logging
 import uuid
-
 import httpx
 from fastapi import APIRouter, HTTPException
-
 from ...core.config import settings
 from ...models.chat import ChatRequest, ChatResponse
 from ...services import agentcore_client, cognito_auth
 
-logger = logging.getLogger(__name__)
 
+logger = logging.getLogger(__name__)
 router = APIRouter(prefix="/api", tags=["Chat"])
 
 

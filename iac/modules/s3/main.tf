@@ -55,12 +55,6 @@ resource "aws_s3_object" "lambda_zip" {
 }
 
 # Upload DDGS Lambda Layer zip (pre-built, shipped with the source).
-#
-# Uses source_hash (a Terraform-only change-detection value), not etag.
-# This file is ~8MB, just over the AWS SDK's multipart-upload threshold, so
-# any upload of it (including this resource's own) produces a multipart S3
-# ETag (format "<hash>-<parts>"), which never equals filemd5()'s plain MD5 —
-# causing permanent drift on every plan if etag is used for comparison.
 resource "aws_s3_object" "ddgs_layer" {
   bucket      = aws_s3_bucket.artifacts.id
   key         = "ddgs-layer.zip"

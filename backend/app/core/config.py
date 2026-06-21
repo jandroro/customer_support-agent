@@ -8,7 +8,6 @@ config.yaml and the environment.
 
 import os
 from typing import Optional
-
 from pydantic import BaseModel
 from pydantic_settings import (
     BaseSettings,

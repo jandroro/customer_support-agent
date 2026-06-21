@@ -7,12 +7,11 @@ on a local .bedrock_agentcore.yaml config file).
 
 import json
 import urllib.parse
-from typing import Optional
-
 import httpx
-
+from typing import Optional
 from ..core.config import settings
 from ..utils.aws import get_boto_session
+
 
 _runtime_arn_cache: Optional[str] = None
 

@@ -12,9 +12,7 @@ MCPServerPool (the only pool the Runtime/Gateway CUSTOM_JWT authorizer trusts):
 import time
 from dataclasses import dataclass
 from typing import Optional
-
 from pycognito import Cognito
-
 from ..core.config import settings
 from ..utils.aws import get_boto_session, get_ssm_parameter
 from ..utils.security import compute_cognito_secret_hash

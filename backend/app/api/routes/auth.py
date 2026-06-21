@@ -1,9 +1,9 @@
 """User registration, login, and token refresh against MCPServerPool."""
 
 from fastapi import APIRouter, HTTPException
-
 from ...models.auth import AuthResponse, LoginRequest, RefreshRequest, RegisterRequest
 from ...services import cognito_auth
+
 
 router = APIRouter(prefix="/api/auth", tags=["Auth"])
 

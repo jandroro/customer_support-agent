@@ -8,10 +8,10 @@ OpenAPI/Swagger metadata, and wires up the route modules from
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-
 from .api.routes import auth, chat, health
 from .core.config import settings
 from .core.logging import configure_logging
+
 
 configure_logging()
 

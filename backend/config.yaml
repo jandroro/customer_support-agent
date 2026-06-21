@@ -1,13 +1,3 @@
-# Backend configuration.
-#
-# Values here are read at startup via app/core/config.py (pydantic-settings).
-# Override any value with an env var using a "__" path delimiter, e.g.:
-#   AWS__PROFILE=your-aws-profile
-#   COGNITO__TEST_PASSWORD=...
-# This lets you keep secrets out of this file in real deployments while
-# still defaulting to the lab/demo credentials already used across this
-# project's notebooks (testuser / MCPServerPool).
-
 aws:
   region: us-east-1
   # Set to your AWS CLI profile name for local development (matches the

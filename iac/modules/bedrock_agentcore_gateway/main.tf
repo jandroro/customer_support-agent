@@ -23,10 +23,6 @@ resource "aws_bedrockagentcore_gateway" "main" {
     }
   }
 
-  # Policy engine + Cedar policies are defined further below in this same
-  # module (not a separate module) to avoid a circular dependency: the
-  # policies' Cedar statements need this gateway's ARN, while this block
-  # needs the policy engine's ARN.
   policy_engine_configuration {
     arn  = aws_bedrockagentcore_policy_engine.main.policy_engine_arn
     mode = "ENFORCE"
@@ -37,7 +33,6 @@ resource "aws_bedrockagentcore_gateway" "main" {
 
 # ------------------------------------------------------------------------------
 # SSM Parameters — gateway identifiers consumed at runtime
-# (matches lab_helpers.utils put_ssm_parameter calls for the gateway)
 # ------------------------------------------------------------------------------
 resource "aws_ssm_parameter" "gateway_id" {
   name        = "/app/customersupport/agentcore/gateway_id"
@@ -77,9 +72,6 @@ resource "aws_ssm_parameter" "gateway_url" {
 
 # ------------------------------------------------------------------------------
 # Observability (CloudWatch Logs + X-Ray) — vended log/trace delivery pipeline.
-# Mirrors modules/bedrock_agentcore_memory and the boto3 enable_observability_for_resource()
-# pattern documented for AgentCore gateway resources: APPLICATION_LOGS -> CWL,
-# TRACES -> XRAY, using the default log group naming convention.
 # ------------------------------------------------------------------------------
 
 # Logs — vended log group + delivery source/destination/delivery
@@ -141,9 +133,6 @@ resource "aws_cloudwatch_log_delivery" "gateway_traces" {
 
 # ------------------------------------------------------------------------------
 # Gateway Target — exposes the CustomerSupport Lambda as an MCP tool target.
-# Tool definitions mirror prerequisite/lambda/api_spec.json; the Lambda target
-# schema requires structured HCL blocks (no raw JSON inline_payload for Lambda
-# targets, unlike OpenAPI/Smithy targets).
 # ------------------------------------------------------------------------------
 resource "aws_bedrockagentcore_gateway_target" "lambda" {
   gateway_identifier = aws_bedrockagentcore_gateway.main.gateway_id
@@ -227,16 +216,7 @@ resource "aws_ssm_parameter" "gateway_target_id" {
 
 # ------------------------------------------------------------------------------
 # Policy Engine — container for the Cedar authorization policies that gate
-# access to this gateway's tools. Mirrors PolicyClient.create_or_get_policy_engine()
-# in lab_helpers (notebooks/lab-03-agentcore-gateway.ipynb).
-#
-# Lives in this module (not a separate one) because it's attached to the
-# gateway above via policy_engine_configuration, and its policies reference
-# the gateway's ARN — keeping both in one module avoids a cross-module cycle.
-#
-# NL-generated policies (PolicyClient.generate_policy) remain in Python — that
-# step is an LLM authoring aid, not a deterministic resource. Once a Cedar
-# statement is finalized, it graduates here as a static aws_bedrockagentcore_policy.
+# access to this gateway's tools.
 # ------------------------------------------------------------------------------
 resource "aws_bedrockagentcore_policy_engine" "main" {
   name        = "customersupport_pe"
@@ -265,17 +245,7 @@ resource "aws_ssm_parameter" "policy_engine_arn" {
 
 # ------------------------------------------------------------------------------
 # Cedar Policies — finalized, static authorization rules for the LambdaUsingSDK
-# gateway target. Mirrors the hardcoded allow_policy/deny_web_search_policy
-# definitions in lab_helpers (notebooks/lab-03-agentcore-gateway.ipynb).
-# validation_mode is fixed to IGNORE_ALL_FINDINGS to match the script's retry
-# fallback, since Terraform can't perform the create/inspect-error/retry dance.
-#
-# depends_on is required here: the statements reference actions derived from
-# the gateway target (LambdaUsingSDK___<tool>), but only via a string built
-# from a hardcoded target/tool name, not a resource attribute reference.
-# Terraform can't infer this dependency on its own, so without depends_on the
-# policy can be created before the target registers its action schema,
-# causing Cedar validation to fail with "unrecognized action".
+# gateway target.
 # ------------------------------------------------------------------------------
 resource "aws_bedrockagentcore_policy" "allow_tools" {
   policy_engine_id = aws_bedrockagentcore_policy_engine.main.policy_engine_id
